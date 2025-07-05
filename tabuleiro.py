@@ -41,7 +41,7 @@ def tabuleiro():
 tabuleiro()
 
 game = True
-while (game == True):
+while (game == True): 
     col, lin = map(int, input('col e lin: ').split())
     while (col < 1 or col > 9 or lin < 1 or lin > 9):    # verifica se a coluna e linha estão entre 1 e 9
         print('Coluna e linha devem ser números entre 1 e 9.')
@@ -51,6 +51,24 @@ while (game == True):
     while (num < 1 or num > 9):    # verifica se o número está entre 1 e 9
         print('O número deve ser de 1 a 9.')
         num = int(input('número 1-9: '))
+
+    for elemento in linhas[lin]: # verifica se o número já não está na linha.
+        while num == elemento or num < 1 or num > 9:
+            if num == elemento:
+                print("Jogada Inválida")
+                num = int(input('número 1-9: '))
+            elif num < 1 or num > 9:
+                print('O número deve ser de 1 a 9.')
+                num = int(input('número 1-9: '))
+    
+    for i in range(9): # verifica se o númer já não está na coluna.
+        while grade[i][col - 1] == num or num < 1 or num > 9:
+            if num == grade[i][col - 1]:
+                print("Jogada Inválida")
+                num = int(input('número 1-9: '))
+            elif num < 1 or num > 9:
+                print('O número deve ser de 1 a 9.')
+                num = int(input('número 1-9: '))
 
     for i in range(9):
         if col == i + 1:
