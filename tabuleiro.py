@@ -35,24 +35,33 @@ def tabuleiro():
         print(letras[i + 1] + ' | ', end='')
         print(letras[i + 2] + ' | ', end='')
         print(letras[i + 3] + ' || ', end='')
-
     print('\n')
 
-tabuleiro()
 
-game = True
-while (game == True): 
+game = True    # continuar o jogo
+count = 0      # contador de casas vazias
+while (game == True):
+    tabuleiro()
+
+    for i in range(9):    # verifica se ainda há casas vazias
+        for j in range(9):
+            if grade[i][j] == 'x':
+                count += 1
+    if (count == 0):
+        print('Parabéns, você completou o Sudoku!')
+        game = False
+
     col, lin = map(int, input('col e lin: ').split())
     while (col < 1 or col > 9 or lin < 1 or lin > 9):    # verifica se a coluna e linha estão entre 1 e 9
         print('Coluna e linha devem ser números entre 1 e 9.')
         col, lin = map(int, input('col e lin: ').split())
-    
+
     num = int(input('número 1-9: '))
     while (num < 1 or num > 9):    # verifica se o número está entre 1 e 9
         print('O número deve ser de 1 a 9.')
         num = int(input('número 1-9: '))
 
-    for elemento in linhas[lin]: # verifica se o número já não está na linha.
+    for elemento in linhas[lin]:    # verifica se o número já não está na linha.
         while num == elemento or num < 1 or num > 9:
             if num == elemento:
                 print("Jogada Inválida")
@@ -61,7 +70,7 @@ while (game == True):
                 print('O número deve ser de 1 a 9.')
                 num = int(input('número 1-9: '))
     
-    for i in range(9): # verifica se o númer já não está na coluna.
+    for i in range(9):    # verifica se o número já não está na coluna.
         while grade[i][col - 1] == num or num < 1 or num > 9:
             if num == grade[i][col - 1]:
                 print("Jogada Inválida")
@@ -75,5 +84,3 @@ while (game == True):
             for j in range(9):
                 if lin == j + 1:
                     linhas[j + 1][i] = num
-
-    tabuleiro()
