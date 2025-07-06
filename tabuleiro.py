@@ -84,3 +84,15 @@ while (game == True):
             for j in range(9):
                 if lin == j + 1:
                     linhas[j + 1][i] = num
+    
+    if (col == 1 or col == 2 or col == 3) and (lin == 1 or lin == 2 or lin == 3):
+        for i in range(3):
+            for j in range(3):
+                while grade[i+1][j] == num or num < 1 or num > 9:
+                    if num == grade[i][col - 1]:
+                        print("Jogada Inválida")
+                        num = int(input('número 1-9: '))
+                    elif num < 1 or num > 9:
+                        print('O número deve ser de 1 a 9.')
+                        num = int(input('número 1-9: '))
+
