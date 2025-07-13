@@ -66,7 +66,7 @@ def carregar_tabuleiro(caminho_arquivo):
                 numero_pistas += 1 # Incrementa o contador de pistas
 
         # Valida a quantidade total de pistas lidas.
-        if not (1 <= numero_pistas <= 80):
+        if 1 > numero_pistas > 80:
             print(f"Erro: Quantidade de pistas inválida ({numero_pistas}). As pistas devem estar entre 1 e 80.")
             return None, None, None
 
@@ -101,16 +101,12 @@ def exibir_tabuleiro(tabuleiro, posicoes_pistas):
     Pistas iniciais são destacadas em vermelho.
     """
     # Define a linha do cabeçalho com as letras das colunas, com espaçamento para alinhar com a grade.
-    cabecalho_colunas = "      A   B   C    D   E   F    G   H   I"
+    cabecalho_colunas = "     A   B   C    D   E   F    G   H   I"
     print(f"\n{cabecalho_colunas}") # Imprime o cabeçalho
 
     # Define as linhas horizontais de separação.
-    # thin_horizontal_line: Linha fina para dentro dos blocos 3x3 e borda externa.
-    linha_fina_horizontal = "    +---+---+---++---+---+---++---+---+---+"
-    # thick_horizontal_line: Linha grossa para separar os blocos 3x3 maiores.
-    linha_grossa_horizontal = "    +===========+===========+===========+"
-
-    print(linha_fina_horizontal) # Imprime a linha superior do tabuleiro
+    linha_fina_horizontal = "  ++---+---+---++---+---+---++---+---+---++"
+    linha_grossa_horizontal = "  ++===========+=============+===========++"
 
     # Itera por cada linha do tabuleiro (0 a 8).
     for r in range(9):
@@ -133,7 +129,10 @@ def exibir_tabuleiro(tabuleiro, posicoes_pistas):
             numero_exibir = str(numero) if numero != 0 else ' ' # Se 0, exibe espaço em branco.
             
             # Define a cor do número: vermelho se for uma pista inicial, senão a cor padrão do terminal.
-            codigo_cor = VERMELHO if (r, c) in posicoes_pistas else RESET
+            if (r, c) in posicoes_pistas:
+                codigo_cor = VERMELHO 
+            else:
+                codigo_cor = RESET
             
             # Adiciona o número formatado com cor e espaços.
             conteudo_linha.append(f" {codigo_cor}{numero_exibir}{RESET} ")
@@ -142,7 +141,7 @@ def exibir_tabuleiro(tabuleiro, posicoes_pistas):
             # '||' para as divisões entre blocos 3x3 verticais (colunas 2 e 5).
             # '|' para as divisões internas de células dentro de um bloco.
             if (c + 1) % 3 == 0:
-                if c < 8: # Não adiciona '||' após a última coluna
+                if c < 9: # Não adiciona '||' após a última coluna
                     conteudo_linha.append("||") 
             else:
                 conteudo_linha.append("|")
