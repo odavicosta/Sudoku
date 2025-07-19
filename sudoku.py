@@ -297,6 +297,11 @@ def modo_interativo(caminho_arquivo_pistas_param):
             else:
                 print(f"{AMARELO}Comando inválido. Use COL,LIN: NUM, ?COL,LIN ou !COL,LIN. Digite 'sair' para encerrar.{RESET}")
 
+
+def modo_batch(caminho_de_pistas_param, caminho_de_resolucao_param):
+    print(f"{caminho_de_resolucao_param} {caminho_de_pistas_param}")
+
+
 def main():
     """
     Função principal do programa Sudoku.
