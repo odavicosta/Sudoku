@@ -1,6 +1,8 @@
 import sys 
 import re
 
+from sudoku_batch import modo_batch
+
 from sudoku_funcoes_utilitarias import (
     RESET, VERMELHO, VERDE, AMARELO, AZUL, CIANO, MAGENTA, # Cores para mensagens no terminal
     COLUNA_PARA_INDICE, INDICE_PARA_COLUNA, # Mapeamentos de coordenadas
@@ -333,10 +335,11 @@ def main():
     else: # Mais de um parâmetro (ou seja, 2 parâmetros para o Modo Batch).
         if numero_parametros == 2:
             # DOIS parâmetros: Ativa Modo Batch.
-            caminho_arquivo_jogo = sys.argv[1] # Primeiro parâmetro é o arquivo do jogo.
-            caminho_arquivo_saida = sys.argv[2] # Segundo parâmetro é o arquivo de saída.
-            print(f"{AZUL}Modo Batch ativado com jogo '{caminho_arquivo_jogo}' e saída '{caminho_arquivo_saida}'. Modo não implementado.{RESET}")
-            # futura chamada para modo_batch(caminho_arquivo_jogo, caminho_arquivo_saida)
+            caminho_de_pistas = sys.argv[1] # Primeiro parâmetro é o arquivo do jogo.
+            caminho_de_resolucao = sys.argv[2] # Segundo parâmetro é o arquivo de saída.
+            print(f"{AZUL}Modo Batch ativado.{RESET}")
+            modo_batch(caminho_de_pistas, caminho_de_resolucao)
+            escolha_valida = True # Altera a condição para sair do loop.
         else:
             # Número de parâmetros inválido.
             print(f"{AMARELO}Número de parâmetros inválido. Use 1 ou 2 parâmetros.{RESET}")
