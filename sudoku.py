@@ -1,8 +1,6 @@
 import sys 
 import re
 
-from sudoku_batch import modo_batch
-
 from sudoku_funcoes_utilitarias import (
     RESET, VERMELHO, VERDE, AMARELO, AZUL, CIANO, MAGENTA, # Cores para mensagens no terminal
     COLUNA_PARA_INDICE, INDICE_PARA_COLUNA, # Mapeamentos de coordenadas
@@ -299,8 +297,77 @@ def modo_interativo(caminho_arquivo_pistas_param):
 
 
 def modo_batch(caminho_de_pistas_param, caminho_de_resolucao_param):
-    print(f"{caminho_de_resolucao_param} {caminho_de_pistas_param}")
+    global tabuleiro_original_pistas, tabuleiro_jogo_atual, posicoes_pistas_iniciais
 
+    # Carrega o tabuleiro inicial
+    tabuleiro_inicial, tabuleiro_jogo, posicoes_pistas = carregar_tabuleiro(caminho_de_pistas_param)
+    if tabuleiro_inicial is None:
+        print(f"{VERMELHO}Erro ao carregar o arquivo de pistas.{RESET}")
+        return
+
+    # Lista para armazenar jogadas inválidas
+    jogadas_invalidas = []
+
+    # Processa o arquivo de resolução
+    try:
+        with open(caminho_de_resolucao_param, 'r') as f:
+            for num_linha, linha in enumerate(f, 1):
+                linha = linha.strip()
+                if not linha:
+                    continue
+
+                # Valida o formato da linha (ex: "A,1: 5")
+                coincidencia = re.match(r'\s*([A-Ia-i])\s*,\s*([1-9])\s*:\s*([1-9])\s*$', linha)
+                if not coincidencia:
+                    jogadas_invalidas.append(f"Linha {num_linha}: Formato inválido -> '{linha}'")
+                    continue
+
+                char_coluna, str_linha, str_numero = coincidencia.groups()
+                coluna = converter_coluna_char_para_indice(char_coluna)
+                linha_num = int(str_linha) - 1  # Índice 0-based
+                numero = int(str_numero)
+
+                # Verifica coordenadas válidas
+                if not (0 <= linha_num < 9 and 0 <= coluna < 9):
+                    jogadas_invalidas.append(f"A jogada {linha} é inválida!'")
+                    continue
+
+                # Verifica se é uma pista inicial (não pode ser sobrescrita)
+                if (linha_num, coluna) in posicoes_pistas:
+                    jogadas_invalidas.append(f"A jogada {linha} é inválida!")
+                    continue
+
+                # Valida a jogada
+                if not validar_movimento(tabuleiro_jogo, linha_num, coluna, numero):
+                    jogadas_invalidas.append(f"A jogada {linha} é inválida!")
+                    continue
+
+                # Se passou todas as validações, aplica a jogada
+                tabuleiro_jogo[linha_num][coluna] = numero
+
+    except FileNotFoundError:
+        print(f"{VERMELHO}Erro: Arquivo de resolução não encontrado.{RESET}")
+        return
+    except Exception as e:
+        print(f"{VERMELHO}Erro ao ler o arquivo de resolução: {e}{RESET}")
+        return
+
+    # Exibe o tabuleiro final
+    exibir_tabuleiro(tabuleiro_jogo, posicoes_pistas)
+
+    # Exibe jogadas inválidas (se houver)
+    if jogadas_invalidas:
+        for invalida in jogadas_invalidas:
+            print(invalida)
+    else:
+        print(f"{VERDE}Todas as jogadas foram válidas!{RESET}")
+
+    # Validação final do tabuleiro
+    if validar_sudoku_completo(tabuleiro_jogo):
+        print(f"{VERDE}A grade foi preenchida com sucesso!{RESET}")
+    else:
+        print(f"{AMARELO}A grade não foi preenchida!{RESET}")
+    
 
 def main():
     """
