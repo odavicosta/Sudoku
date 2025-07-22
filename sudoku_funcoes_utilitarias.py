@@ -17,8 +17,9 @@ INDICE_PARA_COLUNA = {i: chr(ord('A') + i) for i in range(9)} # Dicionário: 0: 
 
 def converter_coluna_char_para_indice(char_coluna):
     """
-    Converte a letra da coluna (ex: 'a', 'b') para seu índice numérico (0-8).
+    Converte a letra da coluna (ex: 'A', 'b') para seu índice numérico (0-8).
     Utiliza o dicionário COLUNA_PARA_INDICE para a conversão.
+    A função .upper() garante que a entrada seja tratada como maiúscula.
     """
     return COLUNA_PARA_INDICE.get(char_coluna.upper())
 
