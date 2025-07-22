@@ -127,10 +127,8 @@ def modo_solucionador(tabuleiro_inicial, posicoes_pistas_iniciais, funcao_exibir
 
     if num_solucoes > 1:
         # Se encontrou mais de uma solução, as pistas são insuficientes para uma solução única.
-        print(f"{AMARELO}\nNão foi possível continuar com a solução. As pistas fornecidas são insuficientes (múltiplas soluções possíveis).{RESET}")
-        print("Tabuleiro original com pistas:")
         funcao_exibir_tabuleiro(tabuleiro_inicial, posicoes_pistas_iniciais) # Exibe o tabuleiro original
-        print(f"{AMARELO}Este Sudoku tem {num_solucoes} ou mais soluções, não sendo possível determinar uma única.{RESET}")
+        print(f"{AMARELO}\nNão foi possível continuar com a solução. As pistas fornecidas são insuficientes (múltiplas soluções possíveis).{RESET}")
     elif num_solucoes == 1:
         # Se encontrou exatamente uma solução, ela é única.
         print(f"{VERDE}\nSolução encontrada e é única!{RESET}")
