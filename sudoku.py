@@ -35,36 +35,38 @@ def carregar_tabuleiro(caminho_arquivo):
             for numero_linha, linha_conteudo in enumerate(f, 1):
                 linha_conteudo = linha_conteudo.strip() # Remove espaços em branco do início e fim da linha
                 if not linha_conteudo: # Ignora linhas vazias
-                    # Se a linha está vazia, simplesmente não faz nada e passa para a próxima iteração.
-                    pass 
-                else:
-                    # Usa expressão regular para extrair COLUNA, LINHA e NUMERO da linha.
-                    coincidencia = re.match(r'\s*([A-Ia-i])\s*,\s*([1-9])\s*:\s*([1-9])\s*$', linha_conteudo)
-                    if not coincidencia:
-                        print(f"Erro no arquivo {caminho_arquivo}, linha {numero_linha}: Formato inválido.")
-                        return None, None, None # Retorna erro se o formato não corresponder
+                    continue
 
-                    # Extrai os grupos capturados pela expressão regular.
-                    char_coluna, str_linha, str_numero = coincidencia.groups()
-                    
-                    # Converte os valores para os tipos corretos e índices baseados em zero.
-                    coluna = converter_coluna_char_para_indice(char_coluna)
-                    linha = int(str_linha) - 1 # Subtrai 1 pois linhas são 1-9 para usuário, 0-8 para código
-                    numero = int(str_numero)
+                # Usa expressão regular para extrair COLUNA, LINHA e NUMERO da linha.
+                # r'\s*([A-Ia-i])\s*,\s*([1-9])\s*:\s*([1-9])\s*$'
+                # \s* : zero ou mais espaços em branco
+                # ([A-Ia-i]) : captura a letra da coluna (A-I, maiúscula ou minúscula)
+                # ([1-9]) : captura o número da linha (1-9)
+                # ([1-9]) : captura o número da pista (1-9)
+                coincidencia = re.match(r'\s*([A-Ia-i])\s*,\s*([1-9])\s*:\s*([1-9])\s*$', linha_conteudo)
+                if not coincidencia:
+                    print(f"Erro no arquivo {caminho_arquivo}, linha {numero_linha}: Formato inválido.")
+                    return None, None, None # Retorna erro se o formato não corresponder
 
-                    # Verifica se a pista não está em uma posição já preenchida (pista duplicada no arquivo).
-                    if tabuleiro[linha][coluna] != 0:
-                        print(f"Erro: Pista duplicada em {char_coluna.upper()},{str_linha}.")
-                        return None, None, None
+                # Extrai os grupos capturados pela expressão regular.
+                char_coluna, str_linha, str_numero = coincidencia.groups()
+                
+                # Converte os valores para os tipos corretos e índices baseados em zero.
+                coluna = converter_coluna_char_para_indice(char_coluna)
+                linha = int(str_linha) - 1 # Subtrai 1 pois linhas são 1-9 para usuário, 0-8 para código
+                numero = int(str_numero)
 
-                    tabuleiro[linha][coluna] = numero # Coloca a pista no tabuleiro
-                    posicoes_pistas.add((linha, coluna)) # Adiciona a posição ao conjunto de pistas
-                    numero_pistas += 1 # Incrementa o contador de pistas
+                # Verifica se a pista não está em uma posição já preenchida (pista duplicada no arquivo).
+                if tabuleiro[linha][coluna] != 0:
+                    print(f"Erro: Pista duplicada em {char_coluna.upper()},{str_linha}.")
+                    return None, None, None
+
+                tabuleiro[linha][coluna] = numero # Coloca a pista no tabuleiro
+                posicoes_pistas.add((linha, coluna)) # Adiciona a posição ao conjunto de pistas
+                numero_pistas += 1 # Incrementa o contador de pistas
 
         # Valida a quantidade total de pistas lidas.
-        # Condição '1 > numero_pistas > 80' foi corrigida para 'not (1 <= numero_pistas <= 80)'
-        # pois a lógica original era sempre False.
-        if not (1 <= numero_pistas <= 80):
+        if 1 > numero_pistas > 80:
             print(f"Erro: Quantidade de pistas inválida ({numero_pistas}). As pistas devem estar entre 1 e 80.")
             return None, None, None
 
@@ -99,15 +101,12 @@ def exibir_tabuleiro(tabuleiro, posicoes_pistas):
     Pistas iniciais são destacadas em vermelho.
     """
     # Define a linha do cabeçalho com as letras das colunas, com espaçamento para alinhar com a grade.
-    cabecalho_colunas = "      A   B   C    D   E   F    G   H   I"
+    cabecalho_colunas = "     A   B   C    D   E   F    G   H   I"
     print(f"\n{cabecalho_colunas}") # Imprime o cabeçalho
 
     # Define as linhas horizontais de separação.
-    linha_fina_horizontal = "    +---+---+---++---+---+---++---+---+---+"
-    linha_grossa_horizontal = "    +===========+===========+===========+"
-
-    # Imprime a linha superior do tabuleiro.
-    print(linha_fina_horizontal) 
+    linha_fina_horizontal = "  ++---+---+---++---+---+---++---+---+---++"
+    linha_grossa_horizontal = "  ++===========+=============+===========++"
 
     # Itera por cada linha do tabuleiro (0 a 8).
     for r in range(9):
@@ -142,10 +141,8 @@ def exibir_tabuleiro(tabuleiro, posicoes_pistas):
             # '||' para as divisões entre blocos 3x3 verticais (colunas 2 e 5).
             # '|' para as divisões internas de células dentro de um bloco.
             if (c + 1) % 3 == 0:
-                if c < 8: # Não adiciona '||' após a última coluna (c=8, que é a 9ª coluna)
+                if c < 9: # Não adiciona '||' após a última coluna
                     conteudo_linha.append("||") 
-                else: # Última coluna, fecha com '|' na borda direita
-                    conteudo_linha.append("|")
             else:
                 conteudo_linha.append("|")
         
@@ -199,106 +196,178 @@ def modo_interativo(caminho_arquivo_pistas_param):
                     reiniciar_jogo = True # Define para True para sair do loop de "jogar novamente".
                 else:
                     print(f"{AMARELO}Entrada inválida. Digite 'S' para sim ou 'N' para não.{RESET}")
-        
-        # O processamento da entrada do usuário só ocorre se o jogo ainda estiver ativo.
-        if jogo_interativo_ativo: 
-            entrada_usuario = input("Sua jogada/comando: ").strip() # Solicita a entrada do usuário.
 
-            # --- Processamento dos Comandos do Usuário ---
-            comando_processado = False # Flag para saber se um comando foi tratado
-            
-            if entrada_usuario.lower() == 'sair':
-                print("Saindo do jogo interativo. Até a próxima!")
-                jogo_interativo_ativo = False # Define para False para sair do loop principal.
-                comando_processado = True # Sinaliza que o comando de saída foi processado
+        # Se o usuário escolheu 'n' para jogar novamente na seção acima, esta condição garante a saída.
+        if not jogo_interativo_ativo:
+            continue # Pula o resto da iteração e o loop principal termina.
 
-            if not comando_processado and entrada_usuario.startswith('?'): # Comando para pedir possibilidades.
-                coincidencia = re.match(r'\?\s*([A-Ia-i])\s*,\s*([1-9])\s*$', entrada_usuario)
-                if coincidencia:
-                    char_coluna, str_linha = coincidencia.groups()
-                    coluna = converter_coluna_char_para_indice(char_coluna)
-                    linha = int(str_linha) - 1
-                    
-                    if not (0 <= linha < 9 and 0 <= coluna < 9):
-                        print(f"{AMARELO}Coordenadas inválidas. Coluna A-I, Linha 1-9.{RESET}")
-                    elif tabuleiro_jogo_atual[linha][coluna] != 0:
-                        print(f"{AMARELO}A célula já está preenchida. Só é possível pedir possibilidades para células vazias.{RESET}")
-                    else:
-                        possibilidades = [str(n) for n in range(1, 10)
-                                          if validar_movimento(tabuleiro_jogo_atual, linha, coluna, n)]
-                        print(f"{CIANO}Possibilidades: {', '.join(possibilidades)}{RESET}")
-                    comando_processado = True # Sinaliza que o comando '?' foi processado
+        entrada_usuario = input("Sua jogada/comando: ").strip() # Solicita a entrada do usuário.
+
+        # --- Processamento dos Comandos do Usuário ---
+
+        if entrada_usuario.lower() == 'sair':
+            print("Saindo do jogo interativo. Até a próxima!")
+            jogo_interativo_ativo = False # Define para False para sair do loop principal.
+            continue # Pula o resto da iteração.
+
+        elif entrada_usuario.startswith('?'): # Comando para pedir possibilidades.
+            # Expressão regular para validar o formato '?COL,LIN' (ex: '?D,3').
+            coincidencia = re.match(r'\?\s*([A-Ia-i])\s*,\s*([1-9])\s*$', entrada_usuario)
+            if coincidencia:
+                char_coluna, str_linha = coincidencia.groups()
+                coluna = converter_coluna_char_para_indice(char_coluna)
+                linha = int(str_linha) - 1
+                
+                # Validação das coordenadas.
+                if not (0 <= linha < 9 and 0 <= coluna < 9):
+                    print(f"{AMARELO}Coordenadas inválidas. Coluna A-I, Linha 1-9.{RESET}")
+                elif tabuleiro_jogo_atual[linha][coluna] != 0:
+                    print(f"{AMARELO}A célula já está preenchida. Só é possível pedir possibilidades para células vazias.{RESET}")
                 else:
-                    print(f"{AMARELO}Formato inválido para possibilidades. Use: ?COL,LIN (Ex: ?D,3){RESET}")
-                    comando_processado = True # Sinaliza que a tentativa de comando '?' foi processada
+                    # Calcula as possibilidades testando cada número de 1 a 9.
+                    possibilidades = [str(n) for n in range(1, 10)
+                                      if validar_movimento(tabuleiro_jogo_atual, linha, coluna, n)]
+                    print(f"{CIANO}Possibilidades: {', '.join(possibilidades)}{RESET}")
+            else:
+                print(f"{AMARELO}Formato inválido para possibilidades. Use: ?COL,LIN (Ex: ?D,3){RESET}")
 
-            if not comando_processado and entrada_usuario.startswith('!'): # Comando para apagar um número.
-                coincidencia = re.match(r'!\s*([A-Ia-i])\s*,\s*([1-9])\s*$', entrada_usuario)
-                if coincidencia:
-                    char_coluna, str_linha = coincidencia.groups()
-                    coluna = converter_coluna_char_para_indice(char_coluna)
-                    linha = int(str_linha) - 1
-                    
-                    if not (0 <= linha < 9 and 0 <= coluna < 9):
-                        print(f"{AMARELO}Coordenadas inválidas. Coluna A-I, Linha 1-9.{RESET}")
-                    elif (linha, coluna) in posicoes_pistas_iniciais:
-                        print(f"{AMARELO}Não é possível apagar uma pista inicial!{RESET}")
-                    elif tabuleiro_jogo_atual[linha][coluna] == 0:
-                        print(f"{AMARELO}A célula já está vazia.{RESET}")
-                    else:
-                        tabuleiro_jogo_atual[linha][coluna] = 0 # Apaga o número (define como 0)
-                        print(f"{VERDE}Valor apagado.{RESET}")
-                    comando_processado = True # Sinaliza que o comando '!' foi processado
+        elif entrada_usuario.startswith('!'): # Comando para apagar um número.
+            # Expressão regular para validar o formato '!COL,LIN' (ex: '!C,4').
+            coincidencia = re.match(r'!\s*([A-Ia-i])\s*,\s*([1-9])\s*$', entrada_usuario)
+            if coincidencia:
+                char_coluna, str_linha = coincidencia.groups()
+                coluna = converter_coluna_char_para_indice(char_coluna)
+                linha = int(str_linha) - 1
+                
+                # Validação das coordenadas.
+                if not (0 <= linha < 9 and 0 <= coluna < 9):
+                    print(f"{AMARELO}Coordenadas inválidas. Coluna A-I, Linha 1-9.{RESET}")
+                elif (linha, coluna) in posicoes_pistas_iniciais:
+                    print(f"{AMARELO}Não é possível apagar uma pista inicial!{RESET}")
+                elif tabuleiro_jogo_atual[linha][coluna] == 0:
+                    print(f"{AMARELO}A célula já está vazia.{RESET}")
                 else:
-                    print(f"{AMARELO}Formato inválido para apagar. Use: !COL,LIN (Ex: !C,4){RESET}")
-                    comando_processado = True # Sinaliza que a tentativa de comando '!' foi processada
+                    tabuleiro_jogo_atual[linha][coluna] = 0 # Apaga o número (define como 0)
+                    print(f"{VERDE}Valor apagado.{RESET}")
+            else:
+                print(f"{AMARELO}Formato inválido para apagar. Use: !COL,LIN (Ex: !C,4){RESET}")
 
-            if not comando_processado: # Se não foi nenhum dos comandos especiais, tenta como jogada de preenchimento.
-                coincidencia = re.match(r'\s*([A-Ia-i])\s*,\s*([1-9])\s*:\s*([1-9])\s*$', entrada_usuario)
-                if coincidencia:
-                    char_coluna, str_linha, str_numero = coincidencia.groups()
-                    coluna = converter_coluna_char_para_indice(char_coluna)
-                    linha = int(str_linha) - 1
-                    numero = int(str_numero)
+        else: # Se não for 'sair', '?' ou '!', assume-se que é uma jogada de preenchimento.
+            # Expressão regular para validar o formato 'COL,LIN: NUM' (ex: 'A,3: 7').
+            coincidencia = re.match(r'\s*([A-Ia-i])\s*,\s*([1-9])\s*:\s*([1-9])\s*$', entrada_usuario)
+            if coincidencia:
+                char_coluna, str_linha, str_numero = coincidencia.groups()
+                coluna = converter_coluna_char_para_indice(char_coluna)
+                linha = int(str_linha) - 1
+                numero = int(str_numero)
 
-                    operacao_valida = True # Flag para controlar se a jogada deve ser aplicada ou não.
-
-                    if not (0 <= linha < 9 and 0 <= coluna < 9 and 1 <= numero <= 9):
-                        print(f"{AMARELO}Jogada inválida: Coordenadas ou número fora do intervalo (Coluna A-I, Linha 1-9, Número 1-9).{RESET}")
-                        operacao_valida = False
-                    elif (linha, coluna) in posicoes_pistas_iniciais:
-                        print(f"{AMARELO}Jogada inválida: não pode alterar pista inicial.{RESET}")
-                        operacao_valida = False
-                    else:
-                        valor_antigo = tabuleiro_jogo_atual[linha][coluna]
-                        if valor_antigo != 0:
-                            print(f"{AMARELO}A célula já está ocupada com '{valor_antigo}'. Deseja sobrescrever (S/N)?{RESET}")
-                            confirmar_sobrescrita_ok = False
-                            while not confirmar_sobrescrita_ok:
-                                confirmacao = input().strip().lower()
-                                if confirmacao == 's':
-                                    confirmar_sobrescrita_ok = True
-                                elif confirmacao == 'n':
-                                    print(f"{AZUL}Sobrescrita cancelada.{RESET}")
-                                    confirmar_sobrescrita_ok = True
-                                    operacao_valida = False # Sinaliza que a operação não deve prosseguir
-                                else:
-                                    print(f"{AMARELO}Entrada inválida. Digite 'S' para sim ou 'N' para não.{RESET}")
-                            
-                            # Se a sobrescrita foi cancelada (operacao_valida foi definida como False)
-                        
-                        if operacao_valida: # Só tenta aplicar e validar se a operação ainda é válida
-                            tabuleiro_jogo_atual[linha][coluna] = numero
-                            if validar_movimento(tabuleiro_jogo_atual, linha, coluna, numero):
-                                print(f"{VERDE}Jogada válida!{RESET}")
+                # Validação das coordenadas e do número.
+                if not (0 <= linha < 9 and 0 <= coluna < 9 and 1 <= numero <= 9):
+                    print(f"{AMARELO}Jogada inválida: Coordenadas ou número fora do intervalo (Coluna A-I, Linha 1-9, Número 1-9).{RESET}")
+                elif (linha, coluna) in posicoes_pistas_iniciais:
+                    print(f"{AMARELO}Jogada inválida: não pode alterar pista inicial.{RESET}")
+                else:
+                    valor_antigo = tabuleiro_jogo_atual[linha][coluna] # Salva o valor atual da célula
+                    if valor_antigo != 0: # Se a célula já estiver ocupada por uma jogada do usuário.
+                        print(f"{AMARELO}A célula já está ocupada com '{valor_antigo}'. Deseja sobrescrever (S/N)?{RESET}")
+                        confirmar_sobrescrita_ok = False # Variável de controle para o loop de confirmação.
+                        while not confirmar_sobrescrita_ok:
+                            confirmacao = input().strip().lower()
+                            if confirmacao == 's':
+                                confirmar_sobrescrita_ok = True # Sai do loop e procede com a jogada.
+                            elif confirmacao == 'n':
+                                print(f"{AZUL}Sobrescrita cancelada.{RESET}")
+                                confirmar_sobrescrita_ok = True # Sai do loop de confirmação.
+                                continue # Pula o resto da lógica da jogada, pois foi cancelada.
                             else:
-                                tabuleiro_jogo_atual[linha][coluna] = valor_antigo
-                                print(f"{AMARELO}Jogada inválida: fere regras do Sudoku (número duplicado na linha, coluna ou bloco). Tente novamente.{RESET}")
-                    
-                    comando_processado = True # Sinaliza que a tentativa de jogada foi processada
-                else: # Se não for nenhum dos comandos esperados
-                    print(f"{AMARELO}Comando inválido. Use COL,LIN: NUM, ?COL,LIN ou !COL,LIN. Digite 'sair' para encerrar.{RESET}")
-                    comando_processado = True # Sinaliza que a entrada foi tratada como inválida
+                                print(f"{AMARELO}Entrada inválida. Digite 'S' para sim ou 'N' para não.{RESET}")
+                        
+                        if not confirmar_sobrescrita_ok: # Se a sobrescrita foi cancelada (confirm == 'n')
+                            continue # Pula o resto da lógica da jogada para a próxima iteração do loop principal.
+
+                    # Tenta fazer a jogada e valida.
+                    tabuleiro_jogo_atual[linha][coluna] = numero # Coloca o número no tabuleiro.
+                    if validar_movimento(tabuleiro_jogo_atual, linha, coluna, numero):
+                        print(f"{VERDE}Jogada válida!{RESET}")
+                    else:
+                        tabuleiro_jogo_atual[linha][coluna] = valor_antigo # Reverte se a jogada for inválida.
+                        print(f"{AMARELO}Jogada inválida: fere regras do Sudoku (número duplicado na linha, coluna ou bloco). Tente novamente.{RESET}")
+            else:
+                print(f"{AMARELO}Comando inválido. Use COL,LIN: NUM, ?COL,LIN ou !COL,LIN. Digite 'sair' para encerrar.{RESET}")
+
+
+def modo_batch(caminho_de_pistas_param, caminho_de_resolucao_param):
+    global tabuleiro_original_pistas, tabuleiro_jogo_atual, posicoes_pistas_iniciais
+
+    # Carrega o tabuleiro inicial
+    tabuleiro_inicial, tabuleiro_jogo, posicoes_pistas = carregar_tabuleiro(caminho_de_pistas_param)
+    if tabuleiro_inicial is None:
+        print(f"{VERMELHO}Erro ao carregar o arquivo de pistas.{RESET}")
+        return
+
+    # Lista para armazenar jogadas inválidas
+    jogadas_invalidas = []
+
+    # Processa o arquivo de resolução
+    try:
+        with open(caminho_de_resolucao_param, 'r') as f:
+            for num_linha, linha in enumerate(f, 1):
+                linha = linha.strip()
+                if not linha:
+                    continue
+
+                # Valida o formato da linha (ex: "A,1: 5")
+                coincidencia = re.match(r'\s*([A-Ia-i])\s*,\s*([1-9])\s*:\s*([1-9])\s*$', linha)
+                if not coincidencia:
+                    jogadas_invalidas.append(f"Linha {num_linha}: Formato inválido -> '{linha}'")
+                    continue
+
+                char_coluna, str_linha, str_numero = coincidencia.groups()
+                coluna = converter_coluna_char_para_indice(char_coluna)
+                linha_num = int(str_linha) - 1  # Índice 0-based
+                numero = int(str_numero)
+
+                # Verifica coordenadas válidas
+                if not (0 <= linha_num < 9 and 0 <= coluna < 9):
+                    jogadas_invalidas.append(f"A jogada {linha} é inválida!'")
+                    continue
+
+                # Verifica se é uma pista inicial (não pode ser sobrescrita)
+                if (linha_num, coluna) in posicoes_pistas:
+                    jogadas_invalidas.append(f"A jogada {linha} é inválida!")
+                    continue
+
+                # Valida a jogada
+                if not validar_movimento(tabuleiro_jogo, linha_num, coluna, numero):
+                    jogadas_invalidas.append(f"A jogada {linha} é inválida!")
+                    continue
+
+                # Se passou todas as validações, aplica a jogada
+                tabuleiro_jogo[linha_num][coluna] = numero
+
+    except FileNotFoundError:
+        print(f"{VERMELHO}Erro: Arquivo de resolução não encontrado.{RESET}")
+        return
+    except Exception as e:
+        print(f"{VERMELHO}Erro ao ler o arquivo de resolução: {e}{RESET}")
+        return
+
+    # Exibe o tabuleiro final
+    exibir_tabuleiro(tabuleiro_jogo, posicoes_pistas)
+
+    # Exibe jogadas inválidas (se houver)
+    if jogadas_invalidas:
+        for invalida in jogadas_invalidas:
+            print(invalida)
+    else:
+        print(f"{VERDE}Todas as jogadas foram válidas!{RESET}")
+
+    # Validação final do tabuleiro
+    if validar_sudoku_completo(tabuleiro_jogo):
+        print(f"{VERDE}A grade foi preenchida com sucesso!{RESET}")
+    else:
+        print(f"{AMARELO}A grade não foi preenchida!{RESET}")
+    
 
 def main():
     """
@@ -313,8 +382,7 @@ def main():
         print(f"{AMARELO}Modo de uso: python sudoku.py <arquivo_pistas.txt> OU python sudoku.py <arquivo_jogo.txt> <arquivo_saida.txt>{RESET}")
         sys.exit(1) # Encerra o programa com código de erro.
     elif numero_parametros == 1:
-        # UM parâmetro: Ativa Modo Interativo ou Modo Solucionador.
-        caminho_arquivo_pistas = sys.argv[1] # O primeiro parâmetro é o arquivo de pistas.
+        caminho_arquivo_pistas = sys.argv[1]
         print("1. Modo Interativo")
         print("2. Modo Solucionador")
         
@@ -343,9 +411,7 @@ def main():
             caminho_de_resolucao = sys.argv[2] # Segundo parâmetro é o arquivo de saída.
             print(f"{AZUL}Modo Batch ativado.{RESET}")
             modo_batch(caminho_de_pistas, caminho_de_resolucao)
-            # Como o modo batch não tem um loop interativo e geralmente executa uma única vez,
-            # não precisamos de uma flag explícita para sair do main.
-            # O programa simplesmente terminará após a execução de modo_batch.
+            escolha_valida = True # Altera a condição para sair do loop.
         else:
             # Número de parâmetros inválido.
             print(f"{AMARELO}Número de parâmetros inválido. Use 1 ou 2 parâmetros.{RESET}")
