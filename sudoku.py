@@ -153,7 +153,7 @@ def modo_interativo(caminho_arquivo_pistas_param):
     # Carrega o tabuleiro inicial do arquivo de pistas.
     tabuleiro_original_pistas, tabuleiro_jogo_atual, posicoes_pistas_iniciais = carregar_tabuleiro(caminho_arquivo_pistas_param)
 
-    # Se houve um erro ao carregar o tabuleiro, exibe uma mensagem e retorna.
+    # Se houve um erro ao carregar o tabuleiro, retorna.
     if tabuleiro_original_pistas is None:
         return
 
