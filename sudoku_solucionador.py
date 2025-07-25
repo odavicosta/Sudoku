@@ -1,3 +1,8 @@
+# _-- EQUIPE SUDOKU: AP3 --_
+# Diego Rebouças Castelo - 581920
+# Francisco Samuel de S. Silva - 579982
+# Davi Fernandes da Costa - 585460
+
 from sudoku_funcoes_utilitarias import (
     validar_movimento, validar_sudoku_completo,
     VERDE, AZUL, AMARELO, RESET # Cores para mensagens no terminal
@@ -70,7 +75,7 @@ def encontrar_numero_de_solucoes(tabuleiro_original, limite_contagem=2):
     tabuleiro_temporario = [linha[:] for linha in tabuleiro_original]
     contador_solucoes = 0 # Variável para armazenar o número de soluções encontradas.
     
-    def _encontrar_solucoes_recursivo(tabuleiro_atual):
+    def encontrar_solucoes_recursivo(tabuleiro_atual):
         # 'nonlocal' é usado para indicar que 'contador_solucoes' não é uma variável local da função aninhada, mas sim da função externa 'encontrar_numero_de_solucoes'.
         nonlocal contador_solucoes
         
@@ -84,7 +89,7 @@ def encontrar_numero_de_solucoes(tabuleiro_original, limite_contagem=2):
             if validar_movimento(tabuleiro_atual, linha, coluna, numero_a_tentar):
                 tabuleiro_atual[linha][coluna] = numero_a_tentar
                 
-                _encontrar_solucoes_recursivo(tabuleiro_atual) # Chamada recursiva para a próxima célula
+                encontrar_solucoes_recursivo(tabuleiro_atual) # Chamada recursiva para a próxima célula
                 
                 if contador_solucoes >= limite_contagem:
                     # Desfaz o movimento para não afetar outras ramificações da busca.
@@ -93,7 +98,7 @@ def encontrar_numero_de_solucoes(tabuleiro_original, limite_contagem=2):
                     
                 tabuleiro_atual[linha][coluna] = 0 # Backtrack: desfaz a tentativa atual para tentar o próximo número.
         
-    _encontrar_solucoes_recursivo(tabuleiro_temporario) # Inicia a busca recursiva.
+    encontrar_solucoes_recursivo(tabuleiro_temporario) # Inicia a busca recursiva.
     return contador_solucoes # Retorna o total de soluções encontradas.
 
 

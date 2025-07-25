@@ -1,3 +1,8 @@
+# _-- EQUIPE SUDOKU: AP3 --_
+# Diego Rebouças Castelo - 581920
+# Francisco Samuel de S. Silva - 579982
+# Davi Fernandes da Costa - 585460
+
 import re # Importa o módulo de expressões regulares para validação de formato de texto
 
 # --- Definições de Cores ANSI para Terminal ---
@@ -23,16 +28,9 @@ def converter_coluna_char_para_indice(char_coluna):
     """
     return COLUNA_PARA_INDICE.get(char_coluna.upper())
 
-def converter_indice_para_coluna_char(indice):
-    """
-    Converte um índice numérico (0-8) para a letra da coluna correspondente (A-I).
-    Utiliza o dicionário INDICE_PARA_COLUNA para a conversão.
-    """
-    return INDICE_PARA_COLUNA.get(indice)
-
 # --- Funções de Validação de Regras do Sudoku ---
 
-def _e_valido_na_linha(tabuleiro, linha, numero, ignorar_coluna=-1):
+def valido_na_linha(tabuleiro, linha, numero, ignorar_coluna=-1):
     """
     Verifica se um 'numero' pode ser colocado em uma 'linha' específica do 'tabuleiro'
     sem violar a regra de não repetição na linha.
@@ -46,7 +44,7 @@ def _e_valido_na_linha(tabuleiro, linha, numero, ignorar_coluna=-1):
     # Isso significa que é válido se o número não está lá, OU se está na posição que estamos ignorando.
     return all(tabuleiro[linha][c] != numero or c == ignorar_coluna for c in range(9))
 
-def _e_valido_na_coluna(tabuleiro, coluna, numero, ignorar_linha=-1):
+def valido_na_coluna(tabuleiro, coluna, numero, ignorar_linha=-1):
     """
     Verifica se um 'numero' pode ser colocado em uma 'coluna' específica do 'tabuleiro' sem violar a regra de não repetição na coluna.
     'ignorar_linha' é usado para ignorar a própria célula que está sendo testada.
@@ -54,7 +52,7 @@ def _e_valido_na_coluna(tabuleiro, coluna, numero, ignorar_linha=-1):
     """
     return all(tabuleiro[r][coluna] != numero or r == ignorar_linha for r in range(9))
 
-def _e_valido_no_bloco(tabuleiro, linha, coluna, numero, ignorar_linha=-1, ignorar_coluna=-1):
+def valido_no_bloco(tabuleiro, linha, coluna, numero, ignorar_linha=-1, ignorar_coluna=-1):
     """
     Verifica se um 'numero' pode ser colocado na célula (linha, coluna) sem violar a regra de não repetição no bloco 3x3 a que a célula pertence.
     'ignorar_linha' e 'ignorar_coluna' são usados para ignorar a própria célula que está sendo testada.
@@ -93,9 +91,9 @@ def validar_movimento(tabuleiro, linha, coluna, numero):
     # Combina as três verificações auxiliares (_e_valido_na_linha, _e_valido_na_coluna, _e_valido_no_bloco).
     # O movimento é válido se todas as três condições forem verdadeiras.
     e_valido = (
-        _e_valido_na_linha(tabuleiro, linha, numero) and
-        _e_valido_na_coluna(tabuleiro, coluna, numero) and
-        _e_valido_no_bloco(tabuleiro, linha, coluna, numero)
+        valido_na_linha(tabuleiro, linha, numero) and
+        valido_na_coluna(tabuleiro, coluna, numero) and
+        valido_no_bloco(tabuleiro, linha, coluna, numero)
     )
     
     # Restaura o valor original na célula do tabuleiro.
@@ -116,9 +114,9 @@ def validar_sudoku_completo(tabuleiro):
             numero = tabuleiro[r][c] # Pega o número da célula atual.
             
             # Valida o 'numero' atual contra as regras, ignorando a própria célula (r, c) para evitar que ele seja considerado uma duplicata de si mesmo.
-            if not (_e_valido_na_linha(tabuleiro, r, numero, c) and
-                    _e_valido_na_coluna(tabuleiro, c, numero, r) and
-                    _e_valido_no_bloco(tabuleiro, r, c, numero, r, c)):
+            if not (valido_na_linha(tabuleiro, r, numero, c) and
+                    valido_na_coluna(tabuleiro, c, numero, r) and
+                    valido_no_bloco(tabuleiro, r, c, numero, r, c)):
                 # Se qualquer uma das verificações falhar, o Sudoku é inválido.
                 return False
     

@@ -1,11 +1,16 @@
+# _-- EQUIPE SUDOKU: AP3 --_
+# Diego Rebouças Castelo - 581920
+# Francisco Samuel de S. Silva - 579982
+# Davi Fernandes da Costa - 585460
+
 import sys 
 import re
 
 from sudoku_funcoes_utilitarias import (
     RESET, VERMELHO, VERDE, AMARELO, AZUL, CIANO, MAGENTA, # Cores para mensagens no terminal
     COLUNA_PARA_INDICE, INDICE_PARA_COLUNA, # Mapeamentos de coordenadas
-    converter_coluna_char_para_indice, converter_indice_para_coluna_char, # Funções de conversão
-    _e_valido_na_linha, _e_valido_na_coluna, _e_valido_no_bloco, # Funções de validação interna
+    converter_coluna_char_para_indice, # Funções de conversão
+    valido_na_linha, valido_na_coluna, valido_no_bloco, # Funções de validação interna
     validar_movimento, validar_sudoku_completo # Funções de validação principal
 )
 
@@ -65,9 +70,9 @@ def carregar_tabuleiro(caminho_arquivo):
             num = tabuleiro[r][c] # Obtém o número da pista
             tabuleiro_temporario = [row[:] for row in tabuleiro] # Cria uma cópia temporária do tabuleiro para validação
             # Verifica se o número da pista é válido na sua linha, coluna e bloco, ignorando a própria célula.
-            if not (_e_valido_na_linha(tabuleiro_temporario, r, num, c) and
-                    _e_valido_na_coluna(tabuleiro_temporario, c, num, r) and
-                    _e_valido_no_bloco(tabuleiro_temporario, r, c, num, r, c)):
+            if not (valido_na_linha(tabuleiro_temporario, r, num, c) and
+                    valido_na_coluna(tabuleiro_temporario, c, num, r) and
+                    valido_no_bloco(tabuleiro_temporario, r, c, num, r, c)):
                 print(f"{VERMELHO}Configuração de dicas inváida!{RESET}")
                 return None, None, None # Retorna erro se uma pista for inválida
 
