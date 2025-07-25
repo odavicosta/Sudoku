@@ -3,14 +3,11 @@
 # Francisco Samuel de S. Silva - 579982
 # Davi Fernandes da Costa - 585460
 
-from sudoku_funcoes_utilitarias import (
-    validar_movimento, validar_sudoku_completo,
-    VERDE, AZUL, AMARELO, RESET # Cores para mensagens no terminal
-)
+from sudoku_funcoes_utilitarias import (validar_movimento, validar_sudoku_completo, VERDE, AZUL, AMARELO, RESET)
 
 def encontrar_proxima_celula_vazia(tabuleiro):
     """
-    Percorre o 'tabuleiro' em busca da próxima célula que está vazia (valor 0).
+    Percorre o 'tabuleiro' em busca da próxima célula vazia (valor 0).
     Retorna a linha e coluna da primeira célula vazia encontrada.
     Se o tabuleiro estiver completamente preenchido, retorna (None, None).
     """
@@ -23,23 +20,21 @@ def encontrar_proxima_celula_vazia(tabuleiro):
 def resolver_sudoku_backtracking(tabuleiro):
     """
     Implementa o algoritmo de Backtracking para tentar resolver o Sudoku.
-    Esta função modifica o 'tabuleiro' passado diretamente (in-place)
-    e retorna True se encontrar UMA solução, False caso contrário.
+    Esta função modifica o 'tabuleiro' passado diretamente (in-place) e retorna True se encontrar UMA
+    solução, False caso contrário.
 
     O Backtracking funciona assim:
     1. Encontra uma célula vazia.
     2. Tenta colocar um número (de 1 a 9) nela.
-    3. Se o número for válido para aquela posição (linha, coluna, bloco), coloca-o.
+    3. Se o número for válido para aquela posição, ele é colocado lá.
     4. Chama a si mesma (recursivamente) para resolver o resto do tabuleiro.
-    5. Se a chamada recursiva retornar True (significa que o resto do tabuleiro foi resolvido),
-       então a solução foi encontrada e True é propagado de volta.
-    6. Se a chamada recursiva retornar False (significa que o número atual não levou a uma solução),
-       o número é removido (backtrack) e o próximo número é tentado.
+    5. Se a chamada recursiva retornar True (o resto do tabuleiro foi resolvido), então a solução foi encontrada e True é propagado de volta.
+    6. Se a chamada recursiva retornar False (o número atual não levou a uma solução), o número é removido e o próximo é tentado.
     7. Se todos os números de 1 a 9 forem tentados e nenhum levar a uma solução, retorna False.
     """
     linha, coluna = encontrar_proxima_celula_vazia(tabuleiro)
 
-    # Caso base da recursão: Se não encontrou nenhuma célula vazia, o tabuleiro está resolvido.
+    # Caso base da recursão: Se não tem célula vazia, o tabuleiro está resolvido.
     if linha is None:
         return True
 
@@ -47,7 +42,7 @@ def resolver_sudoku_backtracking(tabuleiro):
     for numero_a_tentar in range(1, 10):
         # Verifica se o número pode ser  colocado.
         if validar_movimento(tabuleiro, linha, coluna, numero_a_tentar):
-            tabuleiro[linha][coluna] = numero_a_tentar # Tenta colocar o número
+            tabuleiro[linha][coluna] = numero_a_tentar
 
             # Chamada recursiva: tenta resolver o restante do tabuleiro.
             if resolver_sudoku_backtracking(tabuleiro):
@@ -60,23 +55,24 @@ def resolver_sudoku_backtracking(tabuleiro):
 
 def encontrar_numero_de_solucoes(tabuleiro_original, limite_contagem=2):
     """
-    Tenta encontrar soluções para o Sudoku e conta quantas encontra,
-    parando após atingir 'limite_contagem'. Isso é usado para verificar
-    se o Sudoku tem uma solução única (limite_contagem=2).
-    Esta função trabalha em uma cópia do tabuleiro para não modificá-lo permanentemente
-    e para permitir que continue buscando após encontrar uma solução.
+    Tenta encontrar soluções para o Sudoku e conta quantas encontra, parando após atingir 'limite_contagem'.
+    Isso é usado para verificar se o Sudoku tem uma solução única.
+    Esta função trabalha com uma cópia do tabuleiro para não modificá-lo permanentemente e p/ permitir que continue
+    buscando após encontrar uma solução.
 
     Parâmetros:
     - tabuleiro_original: O tabuleiro inicial a ser resolvido.
-    - limite_contagem: O número máximo de soluções a serem encontradas antes de parar. Geralmente 2, para verificar se há mais de uma solução.
+    - limite_contagem: O número máximo de soluções a serem encontradas antes de parar. Nesse caso é 2, para verificar
+    se há mais de uma solução.
     Retorna o número total de soluções encontradas até 'limite_contagem'.
     """
-    # Cria uma cópia profunda do tabuleiro original para não alterá-lo.
+    # Cria uma cópia do tabuleiro original para não alterá-lo.
     tabuleiro_temporario = [linha[:] for linha in tabuleiro_original]
-    contador_solucoes = 0 # Variável para armazenar o número de soluções encontradas.
+    contador_solucoes = 0 
     
     def encontrar_solucoes_recursivo(tabuleiro_atual):
-        # 'nonlocal' é usado para indicar que 'contador_solucoes' não é uma variável local da função aninhada, mas sim da função externa 'encontrar_numero_de_solucoes'.
+        # 'nonlocal' é usado para indicar que 'contador_solucoes' não é uma variável local dessa função, mas sim
+        # da função externa 'encontrar_numero_de_solucoes'.
         nonlocal contador_solucoes
         
         linha, coluna = encontrar_proxima_celula_vazia(tabuleiro_atual)
@@ -105,14 +101,14 @@ def encontrar_numero_de_solucoes(tabuleiro_original, limite_contagem=2):
 def modo_solucionador(tabuleiro_inicial, posicoes_pistas_iniciais, funcao_exibir_tabuleiro):
     """
     Implementa o Modo Solucionador.
-    Ele exibe o tabuleiro inicial, pergunta ao usuário se deve proceder,
-    tenta encontrar a solução e verifica se a solução é única.
+    Ele exibe o tabuleiro inicial, pergunta ao usuário se deve proceder, tenta encontrar a solução e verifica se a
+    solução é única.
     """
     print(f"{VERDE}--- Modo Solucionador ---{RESET}")
     print("Tabuleiro inicial (apenas pistas):")
     funcao_exibir_tabuleiro(tabuleiro_inicial, posicoes_pistas_iniciais)
 
-    # Lógica para perguntar ao usuário se deseja seguir
+    # Pergunta ao usuário se deseja seguir
     seguir_com_solucao = False # Variável de controle do loop
     while not seguir_com_solucao:
         resposta_usuario = input(f"{AZUL}Pistas mostradas. Deseja seguir com a solução do jogo? (S/N): {RESET}").strip().lower()
@@ -135,8 +131,7 @@ def modo_solucionador(tabuleiro_inicial, posicoes_pistas_iniciais, funcao_exibir
         funcao_exibir_tabuleiro(tabuleiro_inicial, posicoes_pistas_iniciais) # Exibe o tabuleiro original
         print(f"{AMARELO}\nNão foi possível continuar com a solução. As pistas fornecidas são insuficientes (múltiplas soluções possíveis).{RESET}")
     elif num_solucoes == 1:
-        # Se encontrou exatamente uma solução, ela é única.
-        print(f"{VERDE}\nSolução encontrada e é única!{RESET}")
+        print(f"{VERDE}\nSolução única encontrada!{RESET}")
         # Agora, resolvemos o Sudoku para exibir a solução completa.
         # Criamos outra cópia do tabuleiro inicial para o resolver_sudoku_backtracking modificar.
         tabuleiro_solucao_final = [linha[:] for linha in tabuleiro_inicial]
@@ -153,6 +148,6 @@ def modo_solucionador(tabuleiro_inicial, posicoes_pistas_iniciais, funcao_exibir
     else: # num_solucoes == 0
         # Se não encontrou nenhuma solução, o Sudoku é insolúvel (pistas contraditórias).
         print(f"{AMARELO}\nNão foi possível encontrar uma solução para este Sudoku.{RESET}")
-        print(f"{AMARELO}As pistas fornecidas são contraditórias ou levam a um Sudoku sem solução.{RESET}")
+        print(f"{AMARELO}As pistas fornecidas são contraditórias e/ou levam a um Sudoku sem solução.{RESET}")
         print("Tabuleiro original com pistas:")
         funcao_exibir_tabuleiro(tabuleiro_inicial, posicoes_pistas_iniciais) # Exibe o tabuleiro original

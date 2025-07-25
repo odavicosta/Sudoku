@@ -24,7 +24,6 @@ posicoes_pistas_iniciais = set() # Um conjunto que guarda as linhas/colunas das 
 def carregar_tabuleiro(caminho_arquivo):
     """
     Carrega o tabuleiro Sudoku de um arquivo de configuração de pistas.
-    O arquivo deve conter pistas no formato 'COL,LIN: NUMERO' (ex: A,3: 5).
     Realiza validações do formato do arquivo e da corretude inicial das pistas.
 
     Retorna uma tupla (tabuleiro_com_pistas, copia_para_jogo, posicoes_das_pistas)
@@ -60,23 +59,22 @@ def carregar_tabuleiro(caminho_arquivo):
                     numero_pistas += 1 # Incrementa o contador de pistas
 
         # Valida a quantidade total de pistas lidas.
-        if not (1 <= numero_pistas <= 80): # Original: 'if 1 > numero_pistas > 80:' - corrigido para lógica correta 'not (1 <= num <= 80)'
+        if not (1 <= numero_pistas <= 80):
             print(f"{VERMELHO}Quantidade de pistas inválida. As pistas devem estar entre 1 e 80.{RESET}")
             return None, None, None
 
-        # Validação da grade de pistas inicial (Requisito 4 do Modo Interativo/Solucionador).
+        # Validação da grade de pistas inicial.
         # Verifica se as pistas fornecidas por si só não violam as regras do Sudoku.
         for r, c in posicoes_pistas: # Itera pelas posições de cada pista
             num = tabuleiro[r][c] # Obtém o número da pista
             tabuleiro_temporario = [row[:] for row in tabuleiro] # Cria uma cópia temporária do tabuleiro para validação
             # Verifica se o número da pista é válido na sua linha, coluna e bloco, ignorando a própria célula.
-            if not (valido_na_linha(tabuleiro_temporario, r, num, c) and
-                    valido_na_coluna(tabuleiro_temporario, c, num, r) and
+            if not (valido_na_linha(tabuleiro_temporario, r, num, c) and valido_na_coluna(tabuleiro_temporario, c, num, r) and
                     valido_no_bloco(tabuleiro_temporario, r, c, num, r, c)):
                 print(f"{VERMELHO}Configuração de dicas inváida!{RESET}")
                 return None, None, None # Retorna erro se uma pista for inválida
 
-        # Cria uma cópia do tabuleiro com as pistas para o jogo interativo (que será modificado pelo usuário).
+        # Cria uma cópia do tabuleiro com as pistas para o jogo interativo.
         tabuleiro_jogo = [linha[:] for linha in tabuleiro]
         
         # Retorna o tabuleiro original (apenas pistas), a cópia para o jogo, e as posições das pistas.
@@ -90,10 +88,7 @@ def carregar_tabuleiro(caminho_arquivo):
         return None, None, None
 
 def exibir_tabuleiro(tabuleiro, posicoes_pistas):
-    """
-    Exibe o tabuleiro Sudoku no terminal com uma formatação visual amigável.
-    Pistas iniciais são destacadas em vermelho.
-    """
+    # Exibe o tabuleiro Sudoku no terminal com o visual adequado. Pistas iniciais são destacadas em vermelho.
     # Define a linha do cabeçalho com as letras das colunas, com espaçamento para alinhar com a grade.
     cabecalho_colunas = "     A   B   C    D   E   F    G   H   I"
     print(f"\n{cabecalho_colunas}") # Imprime o cabeçalho
@@ -149,9 +144,9 @@ def exibir_tabuleiro(tabuleiro, posicoes_pistas):
 
 def modo_interativo(caminho_arquivo_pistas_param):
     """
-    Implementa o Modo Interativo do jogo Sudoku.
-    Permite que o usuário jogue o Sudoku em tempo real, inserindo jogadas,
-    pedindo possibilidades, apagando números e verificando o progresso.
+    Implementa o Modo Interativo.
+    Permite que o usuário jogue inserindo jogadas, pedindo possibilidades, apagando números e
+    verificando o progresso.
     """
     global tabuleiro_original_pistas, tabuleiro_jogo_atual, posicoes_pistas_iniciais
 
@@ -173,7 +168,7 @@ def modo_interativo(caminho_arquivo_pistas_param):
     while jogo_interativo_ativo:
         exibir_tabuleiro(tabuleiro_jogo_atual, posicoes_pistas_iniciais) # Exibe o estado atual do tabuleiro.
 
-        # Verifica se o Sudoku está completo e válido.
+        # Vê se o Sudoku está completo e válido.
         if validar_sudoku_completo(tabuleiro_jogo_atual):
             print(f"{VERDE}Parabéns! Você completou o Sudoku corretamente!{RESET}")
             reiniciar_jogo = False # Variável de controle para o loop de "jogar novamente".
@@ -203,7 +198,6 @@ def modo_interativo(caminho_arquivo_pistas_param):
                 jogo_interativo_ativo = False # Define para False para sair do loop principal.
                 comando_processado = True
             elif entrada_usuario.startswith('?'): # Comando para pedir possibilidades.
-                # Expressão regular para validar o formato '?COL,LIN' (ex: '?D,3').
                 coincidencia = re.match(r'\?\s*([A-Ia-i])\s*,\s*([1-9])\s*$', entrada_usuario)
                 if coincidencia:
                     char_coluna, str_linha = coincidencia.groups()
@@ -225,7 +219,6 @@ def modo_interativo(caminho_arquivo_pistas_param):
                 comando_processado = True # Considera que o formato foi processado, mas inválido
 
             elif entrada_usuario.startswith('!'): # Comando para apagar um número.
-                # Expressão regular para validar o formato '!COL,LIN' (ex: '!C,4').
                 coincidencia = re.match(r'!\s*([A-Ia-i])\s*,\s*([1-9])\s*$', entrada_usuario)
                 if coincidencia:
                     char_coluna, str_linha = coincidencia.groups()
@@ -247,7 +240,6 @@ def modo_interativo(caminho_arquivo_pistas_param):
                 comando_processado = True # Considera que o formato foi processado, mas inválido
 
             else: # Se não for 'sair', '?' ou '!', assume-se que é uma jogada de preenchimento.
-                # Expressão regular para validar o formato 'COL,LIN: NUM' (ex: 'A,3: 7').
                 coincidencia = re.match(r'\s*([A-Ia-i])\s*,\s*([1-9])\s*:\s*([1-9])\s*$', entrada_usuario)
                 if coincidencia:
                     char_coluna, str_linha, str_numero = coincidencia.groups()
@@ -264,7 +256,7 @@ def modo_interativo(caminho_arquivo_pistas_param):
                         valor_antigo = tabuleiro_jogo_atual[linha][coluna] # Salva o valor atual da célula
                         
                         sobrescrever_ok = True # Flag para controlar a sobrescrita
-                        if valor_antigo != 0: # Se a célula já estiver ocupada por uma jogada do usuário.
+                        if valor_antigo != 0: # Se a célula já estiver ocupada por uma jogada.
                             print(f"{AMARELO}A célula já está ocupada com '{valor_antigo}'. Deseja sobrescrever (S/N)?{RESET}")
                             confirmar_sobrescrita_ok = False # Variável de controle para o loop de confirmação.
                             while not confirmar_sobrescrita_ok:
@@ -278,12 +270,11 @@ def modo_interativo(caminho_arquivo_pistas_param):
                                 else:
                                     print(f"{AMARELO}Entrada inválida. Digite 'S' para sim ou 'N' para não.{RESET}")
                         
-                        # e a lógica seguinte foi aninhada sob `if sobrescrever_ok`.
                         if sobrescrever_ok: # Procede com a jogada somente se a sobrescrita foi confirmada ou não era necessária
                             # Tenta fazer a jogada e valida.
                             tabuleiro_jogo_atual[linha][coluna] = numero # Coloca o número no tabuleiro.
                             if not validar_movimento(tabuleiro_jogo_atual, linha, coluna, numero):
-                                tabuleiro_jogo_atual[linha][coluna] = valor_antigo # Reverte se a jogada for inválida.
+                                tabuleiro_jogo_atual[linha][coluna] = valor_antigo # Volta se a jogada for inválida.
                                 print(f"{AMARELO}Jogada inválida.{RESET}")
                 else:
                     print(f"{AMARELO}Comando inválido. Use COL,LIN: NUM, ?COL,LIN ou !COL,LIN. Digite 'sair' para encerrar.{RESET}")
@@ -298,13 +289,13 @@ def modo_batch(caminho_de_pistas_param, caminho_de_resolucao_param):
         print(f"{VERMELHO}Erro ao carregar o arquivo de pistas.{RESET}")
         return
 
-    # Lista para armazenar jogadas inválidas
+    # Lista para guardar jogadas inválidas
     jogadas_invalidas = []
 
     # Processa o arquivo de resolução
     try:
         with open(caminho_de_resolucao_param, 'r') as f:
-            for num_linha, linha_conteudo in enumerate(f, 1): # Renomeado para evitar conflito com a variável `linha` da função `re.match`
+            for num_linha, linha_conteudo in enumerate(f, 1): 
                 linha_conteudo = linha_conteudo.strip()
                 
                 if linha_conteudo: 
@@ -324,7 +315,7 @@ def modo_batch(caminho_de_pistas_param, caminho_de_resolucao_param):
                             jogadas_invalidas.append(f"A jogada {linha_conteudo} é inválida!'")
                             validar_jogada = False
                         
-                        # Verifica se é uma pista inicial (não pode ser sobrescrita)
+                        # Verifica se é uma pista inicial pra saber se pode ser sobrescrita
                         if validar_jogada and (linha_num, coluna) in posicoes_pistas: 
                             jogadas_invalidas.append(f"A jogada {linha_conteudo} é inválida!")
                             validar_jogada = False
@@ -369,9 +360,9 @@ def main():
     """
     Função principal do programa Sudoku.
     Controla o fluxo de execução baseado nos parâmetros da linha de comando.
-    Decide entre Modo Interativo, Modo Solucionador ou Modo Batch.
+    Decide entre os modos Interativo, Solucionador e Batch.
     """
-    numero_parametros = len(sys.argv) - 1 # Conta quantos argumentos foram passados (excluindo o nome do script).
+    numero_parametros = len(sys.argv) - 1 # Conta quantos arquivos foram passados (excluindo o nome do script).
 
     if numero_parametros == 0:
         # Modo de uso incorreto, nenhum parâmetro fornecido.
@@ -400,15 +391,13 @@ def main():
             else:
                 print(f"{AMARELO}Opção inválida. Por favor, digite 1 ou 2.{RESET}")
         # A função main terminará quando 'escolha_valida' for True e o modo selecionado retornar.
-    else: # Mais de um parâmetro (ou seja, 2 parâmetros para o Modo Batch).
-        if numero_parametros == 2:
-            # DOIS parâmetros: Ativa Modo Batch.
+    else: # Mais de um parâmetro
+        if numero_parametros == 2: # Ativa o Modo Batch.
             caminho_de_pistas = sys.argv[1] # Primeiro parâmetro é o arquivo do jogo.
             caminho_de_resolucao = sys.argv[2] # Segundo parâmetro é o arquivo de saída.
             print(f"{AZUL}Modo Batch ativado.{RESET}")
             modo_batch(caminho_de_pistas, caminho_de_resolucao)
-            # 'escolha_valida' não é mais necessária aqui, pois a função main está prestes a terminar
-            # se o modo batch for executado.
+            # 'escolha_valida' não é mais necessária aqui, pois a função main está prestes a terminar se o modo batch for executado.
         else:
             # Número de parâmetros inválido.
             print(f"{AMARELO}Número de parâmetros inválido. Use 1 ou 2 parâmetros.{RESET}")
