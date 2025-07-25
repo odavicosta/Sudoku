@@ -22,13 +22,13 @@ tabuleiro_jogo_atual = []      # Armazena o estado atual do tabuleiro durante o 
 posicoes_pistas_iniciais = set() # Um conjunto que guarda as linhas/colunas das pistas originais (para saber quais células o usuário não pode alterar).
 
 def carregar_tabuleiro(caminho_arquivo):
-    """
-    Carrega o tabuleiro Sudoku de um arquivo de configuração de pistas.
-    Realiza validações do formato do arquivo e da corretude inicial das pistas.
+    
+    #Carrega o tabuleiro Sudoku de um arquivo de configuração de pistas.
+    #Realiza validações do formato do arquivo e da corretude inicial das pistas.
 
-    Retorna uma tupla (tabuleiro_com_pistas, copia_para_jogo, posicoes_das_pistas)
-    ou (None, None, None) em caso de erro.
-    """
+    #Retorna uma tupla (tabuleiro_com_pistas, copia_para_jogo, posicoes_das_pistas)
+    #ou (None, None, None) em caso de erro.
+    
     tabuleiro = [[0 for _ in range(9)] for _ in range(9)] # Inicializa um tabuleiro 9x9 com zeros (0 = célula vazia)
     posicoes_pistas = set() # Conjunto para armazenar as (linha, coluna) das pistas
     numero_pistas = 0        # Contador de pistas lidas
@@ -97,22 +97,21 @@ def exibir_tabuleiro(tabuleiro, posicoes_pistas):
     linha_fina_horizontal = "  ++---+---+---++---+---+---++---+---+---++"
     linha_grossa_horizontal = "  ++===========+=============+===========++"
 
-    # Itera por cada linha do tabuleiro (0 a 8).
     for r in range(9):
         # Imprime a linha de separação horizontal apropriada antes de cada linha de números.
-        # Se for a 3ª ou 6ª linha (r=2 ou r=5), imprime a linha grossa.
+        # Se for a 3a ou 6a linha (r=2 ou r=5), imprime a linha grossa.
         # Caso contrário, imprime a linha fina.
         if r > 0 and r % 3 == 0:
             print(linha_grossa_horizontal)
         else:
             print(linha_fina_horizontal)
         
-        # Constrói o conteúdo da linha de números.
+        # Constrói o conteudo da linha de números.
         conteudo_linha = []
-        # Adiciona o número da linha e o separador vertical esquerdo '||'.
+        # Adiciona o numero da linha e o separador vertical esquerdo '||'.
         conteudo_linha.append(f"{r + 1} ||")
         
-        # Itera por cada coluna na linha atual.
+        # Por cada coluna na linha atual.
         for c in range(9):
             numero = tabuleiro[r][c] # Obtém o número da célula atual.
             numero_exibir = str(numero) if numero != 0 else ' ' # Se 0, exibe espaço em branco.
@@ -143,11 +142,9 @@ def exibir_tabuleiro(tabuleiro, posicoes_pistas):
     print(f"{cabecalho_colunas}\n") # Imprime o rodapé com as letras das colunas
 
 def modo_interativo(caminho_arquivo_pistas_param):
-    """
-    Implementa o Modo Interativo.
-    Permite que o usuário jogue inserindo jogadas, pedindo possibilidades, apagando números e
-    verificando o progresso.
-    """
+    #Implementa o Modo Interativo.
+    #Permite que o usuário jogue inserindo jogadas, pedindo possibilidades, apagando números e verificando o progresso.
+    
     global tabuleiro_original_pistas, tabuleiro_jogo_atual, posicoes_pistas_iniciais
 
     # Carrega o tabuleiro inicial do arquivo de pistas.
@@ -403,7 +400,6 @@ def main():
             print(f"{AMARELO}Número de parâmetros inválido. Use 1 ou 2 parâmetros.{RESET}")
         sys.exit(1) # Encerra o programa com código de erro.
 
-# Garante que a função 'main()' seja chamada apenas quando o script for executado diretamente,
-# e não quando for importado como um módulo em outro script.
+# Garante que a função 'main()' seja chamada apenas quando o script for executado diretamente, e não quando for importado como um módulo em outro script.
 if __name__ == "__main__":
     main()
